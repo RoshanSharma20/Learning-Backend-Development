@@ -4,7 +4,6 @@ const app = express();
 app.use(express.json());
 app.listen(3000);
 
-
 //mounting in express ->used to segregate same routes with different http methods,resembling as small mini applications
 let users = [
     {
@@ -23,9 +22,11 @@ let users = [
 
 //create a router object
 const UserRouter = express.Router();
+const AuthRouter = express.Router();
 
 //specifying the base url and determining which router to user for the particular base url
 app.use('/user', UserRouter);
+app.use('/auth', AuthRouter);
 
 UserRouter
     .route('/')
@@ -36,6 +37,11 @@ UserRouter
 
 
 UserRouter.route('/:id').get(getUserById);
+
+AuthRouter
+    .route('/signup')
+    .get(getSignUp)
+    .post(postSignUp)
 
 function getUser(req, res) {
     res.json(users);
@@ -81,4 +87,18 @@ function getUserById(req, res) {
         message: "req received",
         data: obj
     })
+}
+
+function getSignUp(req, res) {
+    //file stored in public folder
+    res.sendFile('./public/index.html', { root: __dirname });
+}
+
+function postSignUp(req, res) {
+    let obj = req.body;
+    console.log('backend', obj);
+    res.json({
+        message: "user signed up",
+        data: obj
+    });
 }
