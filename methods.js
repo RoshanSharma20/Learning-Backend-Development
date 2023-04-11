@@ -1,7 +1,8 @@
 const express = require('express');
 const app = express();
 
-app.use(express.json());
+app.use(express.json());//express.json() is also a middleware that helps to parse json object to js object
+
 app.listen(3000);
 
 //mounting in express ->used to segregate same routes with different http methods,resembling as small mini applications
@@ -40,7 +41,7 @@ UserRouter.route('/:id').get(getUserById);
 
 AuthRouter
     .route('/signup')
-    .get(getSignUp)
+    .get(middleware1, getSignUp, middleware2)//adding the middleware to understand the flow of execution
     .post(postSignUp)
 
 function getUser(req, res) {
@@ -89,9 +90,27 @@ function getUserById(req, res) {
     })
 }
 
-function getSignUp(req, res) {
-    //file stored in public folder
+//adding middleware1 function
+function middleware1(req, res, next) {
+    console.log('middleware1 executed');
+    next();
+}
+
+
+//adding middleware2 function
+function middleware2(req, res)//next is not required here as res is already being sent in this function
+{
+    console.log('middleware2 executed');
+    console.log('sending the response as the index file')
     res.sendFile('./public/index.html', { root: __dirname });
+}
+
+
+function getSignUp(req, res, next) {//adding the next function to allow for next function to be executed
+    //file stored in public folder
+    // res.sendFile('./public/index.html', { root: __dirname });
+    console.log('get user function called');
+    next();
 }
 
 function postSignUp(req, res) {
