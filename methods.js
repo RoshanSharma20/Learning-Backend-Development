@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const mongoose = require('mongoose');
 
 app.use(express.json());//express.json() is also a middleware that helps to parse json object to js object
 
@@ -121,3 +122,55 @@ function postSignUp(req, res) {
         data: obj
     });
 }
+
+
+//connecting mongoose to the database
+const db_link = 'mongodb+srv://Admin:D4YP7PjXSNL0iisO@cluster0.st59zgv.mongodb.net/?retryWrites=true&w=majority';
+mongoose.connect(db_link)
+    .then((db) => {
+        console.log('db connected');
+    })
+    .catch((err) => {
+        console.log(err);
+    });
+
+
+//creating the userSchema
+const userSchema = mongoose.Schema({
+    name: {
+        type: String,
+        required: true
+    },
+    email: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    password: {
+        type: String,
+        required: true,
+        min: 3
+    },
+    confirmPassword: {
+        type: String,
+        required: true,
+        min: 3
+    }
+})
+
+
+//creating model
+const userModel = mongoose.model('userModel', userSchema);
+
+(async function createUser() {
+    let user = {
+        name: 'mario',
+        email: 'abc@gmail.com',
+        password: '1234',
+        confirmPassword: '1234'
+    };
+
+    //the returned value is the data is inserted in the database
+    let data = await userModel.create(user);
+    console.log(data);
+})();
