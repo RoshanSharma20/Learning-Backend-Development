@@ -1,26 +1,27 @@
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
+const emailValidator = require('email-validator');
 
 app.use(express.json());//express.json() is also a middleware that helps to parse json object to js object
 
 app.listen(3000);
 
 //mounting in express ->used to segregate same routes with different http methods,resembling as small mini applications
-let users = [
-    {
-        "id": 1,
-        "name": "superman"
-    },
-    {
-        "id": 2,
-        "name": "batman"
-    },
-    {
-        "id": 3,
-        "name": "robin"
-    }
-];
+// let users = [
+//     {
+//         "id": 1,
+//         "name": "superman"
+//     },
+//     {
+//         "id": 2,
+//         "name": "batman"
+//     },
+//     {
+//         "id": 3,
+//         "name": "robin"
+//     }
+// ];
 
 //create a router object
 const UserRouter = express.Router();
@@ -32,7 +33,7 @@ app.use('/auth', AuthRouter);
 
 UserRouter
     .route('/')
-    .get(getUser)
+    .get(getUsers)
     .post(postUser)
     .patch(updateUser)
     .delete(deleteUser);
@@ -45,8 +46,15 @@ AuthRouter
     .get(middleware1, getSignUp, middleware2)//adding the middleware to understand the flow of execution
     .post(postSignUp)
 
-function getUser(req, res) {
-    res.json(users);
+async function getUsers(req, res) {
+    // let allUsers = await userModel.find();
+
+    //to find particular user with specified query
+    let allUsers = await userModel.findOne({ name: 'mario' });
+    res.json({
+        message: 'list of all users',
+        data: allUsers
+    });
 }
 
 function postUser(req, res) {
@@ -59,22 +67,30 @@ function postUser(req, res) {
         users: req.body
     });
 }
-function updateUser(req, res) {
+async function updateUser(req, res) {
     console.log(req.body);
     let dataToBeUpdated = req.body;
-    //using the for in loop to update the user object
-    for (key in dataToBeUpdated) {
-        users[key] = dataToBeUpdated[key];
-    }
+    // //using the for in loop to update the user object
+    // for (key in dataToBeUpdated) {
+    //     users[key] = dataToBeUpdated[key];
+    // }
+
+
+    // update the value in the database
+    let userData = await userModel.findOneAndUpdate({ email: 'abc@gmail.com' }, dataToBeUpdated);
     //a response needs to be sent back
     res.json({
-        message: "data has been updated successfully"
+        message: "data has been updated successfully",
+        data: userData
     })
 }
-function deleteUser(req, res) {
+async function deleteUser(req, res) {
+    let dataToBeDeleted = req.body;
+    let userData = await userModel.findOneAndDelete(dataToBeDeleted);
     res.json({
-        message: "content has been deleted"
-    })
+        message: "content has been deleted",
+        data: userData
+    });
 }
 
 function getUserById(req, res) {
@@ -114,12 +130,13 @@ function getSignUp(req, res, next) {//adding the next function to allow for next
     next();
 }
 
-function postSignUp(req, res) {
-    let obj = req.body;
-    console.log('backend', obj);
+async function postSignUp(req, res) {
+    let dataObj = req.body;
+    let user = await userModel.create(dataObj);
+    // console.log('backend', obj);
     res.json({
         message: "user signed up",
-        data: obj
+        data: user
     });
 }
 
@@ -144,33 +161,55 @@ const userSchema = mongoose.Schema({
     email: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        validate: function () {
+            return emailValidator.validate(this.email);
+        }
     },
     password: {
         type: String,
         required: true,
-        min: 3
+        minLength: 3
     },
     confirmPassword: {
         type: String,
         required: true,
-        min: 3
+        minLength: 3,
+        validate: function () {
+            return this.confirmPassword == this.password;
+        }
     }
 })
 
 
+//attaching the pre-hook with the userSchema
+userSchema.pre('save', function () {
+    console.log('before saving in db', this);//this ->refers to the object that has been created by mongoose(i.e consisting of all details with id)
+});
+
+
+//attaching the pre-hook with userSchema to remove the confirm password by making it undefined
+userSchema.pre('save', function () {
+    this.confirmPassword = undefined;
+})
+
+//attaching the post-hook with the userSchema
+userSchema.post('save', function (doc) {
+    console.log('after saving in the db', doc);//doc -> is the object that is saved in the db
+})
+
 //creating model
 const userModel = mongoose.model('userModel', userSchema);
 
-(async function createUser() {
-    let user = {
-        name: 'mario',
-        email: 'abc@gmail.com',
-        password: '1234',
-        confirmPassword: '1234'
-    };
+// (async function createUser() {
+//     let user = {
+//         name: 'mario',
+//         email: 'abc@gmail.com',
+//         password: '1234',
+//         confirmPassword: '1234'
+//     };
 
-    //the returned value is the data is inserted in the database
-    let data = await userModel.create(user);
-    console.log(data);
-})();
+//     //the returned value is the data is inserted in the database
+//     let data = await userModel.create(user);
+//     console.log(data);
+// })();
