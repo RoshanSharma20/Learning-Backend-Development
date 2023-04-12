@@ -3,10 +3,11 @@ const app = express();
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 const userModel = require('./models/userModel');
-
+const cookieParser = require('cookie-parser');
 app.use(express.json());//express.json() is also a middleware that helps to parse json object to js object
 
 app.listen(3000);
+app.use(cookieParser());
 
 //mounting in express ->used to segregate same routes with different http methods,resembling as small mini applications
 // let users = [
@@ -38,6 +39,17 @@ UserRouter
     .post(postUser)
     .patch(updateUser)
     .delete(deleteUser);
+
+
+
+//implementing cookies
+UserRouter
+    .route('/getCookies')
+    .get(getCookies);
+
+UserRouter
+    .route('/setCookies')
+    .get(setCookies);
 
 
 UserRouter.route('/:id').get(getUserById);
@@ -139,4 +151,17 @@ async function postSignUp(req, res) {
         message: "user signed up",
         data: user
     });
+}
+
+function setCookies(req, res) {
+    // res.setHeader('Set-Cookie', 'isLoggenIn=true');
+    res.cookie('isLoggedIn', true, { maxAge: 1000 * 60 * 60 * 24 });
+    res.send('cookies has been set');
+}
+
+
+function getCookies(req, res) {
+    let cookies = req.cookies.isLoggedIn;
+    console.log(cookies);
+    res.send('cookies is received');
 }
