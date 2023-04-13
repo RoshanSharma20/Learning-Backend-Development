@@ -56,12 +56,12 @@ userSchema.pre('save', function () {
 });
 
 //attaching the pre-hook with userSchema to encrypt the password
-userSchema.pre('save', async function () {
-    const salt = await bcrypt.genSalt(10);
-    const hashedpass = await bcrypt.hash(this.password, salt);
-    // console.log(hashedpass);
-    this.password = hashedpass;
-})
+// userSchema.pre('save', async function () {
+//     const salt = await bcrypt.genSalt(10);
+//     const hashedpass = await bcrypt.hash(this.password, salt);
+//     // console.log(hashedpass);
+//     this.password = hashedpass;
+// })
 
 //attaching the post-hook with the userSchema
 userSchema.post('save', function (doc) {
