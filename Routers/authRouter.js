@@ -2,6 +2,9 @@ const express = require('express');
 const userModel = require('../models/userModel');
 const AuthRouter = express.Router();
 
+
+// app.use(cookieParser());
+
 AuthRouter
     .route('/signup')
     .get(middleware1, getSignUp, middleware2)//adding the middleware to understand the flow of execution
@@ -52,6 +55,7 @@ async function loginUser(req, res) {
             if (user) {
                 //need to implement the bcrypt function here later
                 if (user.password == data.password) {
+                    res.cookie('isLoggedIn', true, { httpOnly: true });
                     res.json({
                         message: "user has logged in",
                         userDetails: data

@@ -2,10 +2,13 @@ const express = require('express');
 const userModel = require('../models/userModel');
 const cookieParser = require('cookie-parser');
 const UserRouter = express.Router();
+const protectRoute = require('../Routers/authHelper');
+
+// app.use(cookieParser());
 
 UserRouter
     .route('/')
-    .get(getUsers)
+    .get(protectRoute, getUsers)
     .post(postUser)
     .patch(updateUser)
     .delete(deleteUser);
