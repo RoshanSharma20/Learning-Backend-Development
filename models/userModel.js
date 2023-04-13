@@ -40,8 +40,17 @@ const userSchema = mongoose.Schema({
         validate: function () {
             return this.confirmPassword == this.password;
         }
+    },
+    role: {
+        type: String,
+        enum: ['admin', 'user', 'restaurantowner', 'deliveryboy'],
+        default: 'user'
+    },
+    profileImage: {
+        type: String,//the location of the image is a url which will be accessed later
+        default: 'img/users/default.jpeg'//default location of the profileImage
     }
-})
+});
 
 
 //attaching the pre-hook with the userSchema
