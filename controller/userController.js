@@ -19,6 +19,7 @@ module.exports.updateUser = async function updateUser(req, res) {
     try {
         let id = req.params.id;
         let user = await userModel.findById(id);
+        // console.log(user);
         let dataToBeUpdated = req.body;
 
         if (user) {
@@ -26,11 +27,15 @@ module.exports.updateUser = async function updateUser(req, res) {
             for (let key in dataToBeUpdated) {
                 keys.push(key);
             }
+            // console.log(keys);
+            console.log(user['name']);
 
             for (let i = 0; i < keys.length; ++i) {
                 user[keys[i]] = dataToBeUpdated[keys[i]];
             }
 
+            // console.log(user);
+            user.confirmPassword = user.password;//add this line to remove the error occuring during saving the new details for the existing user
             const updatedData = await user.save();//the values have been updated in the database
 
             //a response needs to be sent back

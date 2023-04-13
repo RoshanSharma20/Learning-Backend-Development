@@ -22,13 +22,13 @@ UserRouter.route('/login')
     .post(login);
 
 //profile page
-// UserRouter.use(protectRoute);
+UserRouter.use(protectRoute);
 UserRouter.route('/userProfile')
-    .get(protectRoute, getUser)
+    .get(getUser)
 
 
 //admin specific function        
-UserRouter.use(isAuthorised(['admin']));//passing the isAuthorised function with an array  
-UserRouter.route('')
-    .get(getAllUser)
+// UserRouter.use(isAuthorised());//passing the isAuthorised function with an array  
+UserRouter.route('/')
+    .get(isAuthorised, getAllUser)
 module.exports = UserRouter;
