@@ -84,7 +84,7 @@ module.exports.isAuthorised = async function isAuthorised(req, res, next) {
                 const user = await userModel.findById(payload.payload);
                 // req.role = user.role;
                 req.id = user.id;
-                if (user.role == 'admin')
+                if (user.role == 'admin' || user.role == 'restaurantowner')
                     next();
                 else {
                     res.json({

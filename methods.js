@@ -14,3 +14,7 @@ app.use(cookieParser());
 //specifying the base url and determining which router to user for the particular base url
 app.use('/user', UserRouter);
 // app.use('/auth', AuthRouter);
+
+
+//testing the planSchema
+const planModel = require('./models/planModel');
