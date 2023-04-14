@@ -38,5 +38,16 @@ const reviewSchema = new mongoose({
     }
 });
 
+
+//find the reference for user and plan
+reviewSchema.pre(/^find/, function (next) {
+    this.populate({
+        path: "user",
+        select: "name profileImage"
+    }).populate("plan");
+    next();
+});
+
+
 const reviewModel = mongoose.model('reviewModel', reviewSchema);
 module.exports = reviewModel;
