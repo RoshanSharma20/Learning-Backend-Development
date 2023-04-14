@@ -9,7 +9,7 @@ app.use(express.json());//express.json() is also a middleware that helps to pars
 const UserRouter = require('./Routers/userRouter');
 // const AuthRouter = require('./Routers/authRouter');
 const planRouter = require('./Routers/planRouter');
-
+const reviewRouter = require('./Routers/reviewRouter');
 
 app.listen(3000);
 app.use(cookieParser());
@@ -19,4 +19,6 @@ app.use('/user', UserRouter);
 // app.use('/auth', AuthRouter);
 
 app.use('/plans', planRouter);
+
+app.use('reviews', reviewRouter);
 
