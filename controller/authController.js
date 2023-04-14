@@ -126,6 +126,11 @@ module.exports.protectRoute = async function protectRoute(req, res, next) {
             }
         }
         else {
+
+            //if request is coming from browser
+            const client = req.get('User-Agent');
+            if (client.includes("Mozilla") == true)
+                return res.redirect('/login');
             res.json({
                 message: "you need to login"
             })
@@ -134,6 +139,75 @@ module.exports.protectRoute = async function protectRoute(req, res, next) {
     catch (err) {
         res.json({
             message: "some error occured"
+        })
+    }
+}
+
+//forget password
+module.exports.forgetpassword = async function forgetpassword(req, res) {
+    let { email } = req.body;
+    try {
+        const user = await userModel.findOne({ email: email });
+        if (user) {
+            const resetToken = user.createResetToken();
+            //http://abc.com/resetpassword/resetToken
+            let resetpasswordLink = `${req.protocol}://${req.get('host')}/resetpassword/${resetToken}`;
+            //send email to the user
+
+            //using nodemailer we will send the mail to reset password
+        }
+        else {
+            res.json({
+                message: "please signup"
+            });
+        }
+    }
+    catch (err) {
+        res.status(500).json({
+            message: err.message
+        })
+    }
+}
+
+//resetpassword
+module.exports.resetpassword = async function resetpassword(req, res) {
+    try {
+        const token = req.params.token;//the reset token is saved in user data base
+        let { password, confirmpassword } = req.body;
+        const user = await userModel.findOne({ resetToken: token });
+        //resetpasswordhandler will save password in db
+        if (user) {
+            user.resetpasswordhandler(password, confirmpassword);
+            await user.save();
+            res.json({
+                message: "user password changed successfully, please login again",
+            })
+        }
+        else {
+            res.json({
+                message: "user not found"
+            })
+        }
+    }
+    catch (err) {
+        res.json({
+            message: err.message
+        })
+    }
+}
+
+
+//logout function
+module.exports.logout = function logout(req, res) {
+    try {
+        res.cookie('login', ' ', { maxAge: 1 });
+        res.json({
+            message: "user logged out successfully"
+        })
+    }
+    catch (err) {
+        res.json({
+            message: err.message
         })
     }
 }

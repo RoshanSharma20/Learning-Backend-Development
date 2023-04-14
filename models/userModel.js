@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const emailValidator = require('email-validator');
 const bcrypt = require('bcrypt');
 const { Schema } = mongoose;
+const crypto = require('crypto');
+const { config } = require('process');
 
 //connecting mongoose to the database
 const db_link = 'mongodb+srv://Admin:D4YP7PjXSNL0iisO@cluster0.st59zgv.mongodb.net/?retryWrites=true&w=majority';
@@ -49,7 +51,8 @@ const userSchema = mongoose.Schema({
     profileImage: {
         type: String,//the location of the image is a url which will be accessed later
         default: 'img/users/default.jpeg'//default location of the profileImage
-    }
+    },
+    resetToken: String
 });
 
 
@@ -76,6 +79,25 @@ userSchema.pre('save', function () {
 userSchema.post('save', function (doc) {
     console.log('after saving in the db', doc);//doc -> is the object that is saved in the db
 })
+
+
+
+//attaching methods to userSchema
+//createResetToken method
+userSchema.methods.createResetToken = function () {
+    //creating unique token using npm i crypto
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    this.resetToken = resetToken;
+    return resetToken;
+}
+
+
+//resetpasswordhandler method
+userSchema.methods.resetpasswordhandler = function (password, confirmPassword) {
+    this.password = password;
+    this.confirmPassword = this.confirmPassword;
+    this.resetToken = undefined;//making the reset token in the user document as undefined after finishing with reseting the password
+}
 
 //creating model
 const userModel = mongoose.model('userModel', userSchema);

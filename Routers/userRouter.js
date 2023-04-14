@@ -4,7 +4,7 @@ const express = require('express');
 const UserRouter = express.Router();
 // const protectRoute = require('../Routers/authHelper');
 const { getUser, getAllUser, updateUser, deleteUser } = require('../controller/userController');
-const { signup, login, isAuthorised, protectRoute } = require('../controller/authController');
+const { signup, login, isAuthorised, protectRoute, forgetpassword, resetpassword, logout } = require('../controller/authController');
 // app.use(cookieParser());
 
 
@@ -26,6 +26,20 @@ UserRouter.use(protectRoute);
 UserRouter.route('/userProfile')
     .get(getUser)
 
+
+//forget password
+UserRouter.route('/forgetpassword')
+    .post(forgetpassword)
+
+
+//reset password
+UserRouter.route('/forgetpassword/:token')
+    .post(resetpassword)
+
+
+
+UserRouter.route('/logout')
+    .get(logout);
 
 //admin specific function        
 // UserRouter.use(isAuthorised());//passing the isAuthorised function with an array  
