@@ -41,18 +41,18 @@ const planSchema = new mongoose.Schema({
 const planModel = mongoose.model('planModel', planSchema);
 
 //creating an immediatley invoke function to store the plan for testing purpose
-(async function createPlan() {
-    let planObj = {
-        name: 'superfood10',
-        duration: 30,
-        price: 1000,
-        ratingsAverage: 5,
-        discount: 30
-    }
-    // let data = await planModel.create(planObj);
-    // console.log(data);
-    const doc = new planModel(planObj);
-    await doc.save();
-})();
+// (async function createPlan() {
+//     let planObj = {
+//         name: 'superfood10',
+//         duration: 30,
+//         price: 1000,
+//         ratingsAverage: 5,
+//         discount: 30
+//     }
+//     // let data = await planModel.create(planObj);
+//     // console.log(data);
+//     const doc = new planModel(planObj);
+//     await doc.save();
+// })();
 
 module.exports = planModel;
